@@ -1,11 +1,12 @@
 import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {Task} from './../../models/task.models'
+import {Task} from './../../models/task.models';
+import {FormControl, ReactiveFormsModule, Validators} from '@angular/forms'
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
@@ -23,12 +24,21 @@ export class HomeComponent {
     },
   ]);
 
-  changeHandler(event: Event){
-    const input = event.target as HTMLInputElement;
-    const newTask = input.value;
-    this.addTask(newTask);
-    
+  newTaskCtrl = new FormControl('tarea',{
+    nonNullable: true,
+    validators: [
+      Validators.required,
+    ],
+  });
 
+  changeHandler(){
+    if(this.newTaskCtrl.valid){ //&& !/^\s*$/.test(this.newTaskCtrl.value) opcion para validar que no viene vacio
+      const value = this.newTaskCtrl.value.trim();
+      if(value !== ''){
+        this.addTask(value);
+        this.newTaskCtrl.setValue('');
+      }
+    }
   }
 
   addTask(title: string){
