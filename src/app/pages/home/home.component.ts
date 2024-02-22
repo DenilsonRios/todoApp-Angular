@@ -1,4 +1,4 @@
-import { Component, computed, signal } from '@angular/core';
+import { Component, Injector, computed, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {Task} from './../../models/task.models';
 import {FormControl, ReactiveFormsModule, Validators} from '@angular/forms'
@@ -10,19 +10,10 @@ import {FormControl, ReactiveFormsModule, Validators} from '@angular/forms'
   templateUrl: './home.component.html',
   styleUrl: './home.component.css'
 })
+
+
 export class HomeComponent {
-  tasks =signal<Task[]>( [
-    {
-      id: Date.now(),
-      title: 'Crear Proyecto',
-      completed: false
-    },
-    {
-      id: Date.now(),
-      title: 'Crear Componentes',
-      completed: false
-    },
-  ]);
+  tasks =signal<Task[]>([]);
 
   filter = signal<'all' | 'pending' | 'completed'>('all');
 
@@ -44,6 +35,25 @@ export class HomeComponent {
       Validators.required,
     ],
   });
+
+  injector = inject(Injector);
+
+  ngOnInit(){
+    const storage = localStorage.getItem('tasks');
+    if(storage){
+      const storageTasks = JSON.parse(storage);
+      this.tasks.set(storageTasks);
+    }
+    this.trackTasks();
+  }
+
+  trackTasks(){
+    effect(() => {
+      const tasks = this.tasks();
+      console.log(tasks);
+      localStorage.setItem('tasks', JSON.stringify(tasks));
+    }, {injector: this.injector});
+  } 
 
   changeHandler(){
     if(this.newTaskCtrl.valid){ //&& !/^\s*$/.test(this.newTaskCtrl.value) opcion para validar que no viene vacio
