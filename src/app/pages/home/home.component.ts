@@ -79,18 +79,6 @@ export class HomeComponent {
     this.tasks.update((tasks) =>tasks.filter((task,position) => position !== index));
   }
 
-  /*updateTask(index: number){
-    this.tasks.update((tasks) =>
-      tasks.map((task, position) => {
-        if(position === index){
-          task.completed = !task.completed;
-        }
-        return task;
-      })
-    );
-
-  }*/
-
   updateTask(index: number) {
     this.tasks.update((tasks) => {
       return tasks.map((task,position) => {
@@ -143,6 +131,9 @@ export class HomeComponent {
     this.filter.set(filter);
   }
 
+  deleteCompleted(){
+    this.tasks.update((tasks) => tasks.filter(task => !task.completed));
 
+  }
 
 }
